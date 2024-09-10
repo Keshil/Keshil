@@ -1,8 +1,10 @@
 import aiohttp
 import asyncio
 import json
+import os
 
-TOKEN = 'YOUR_DISCORD_USER_TOKEN'  # Replace with your Discord user token
+# Read the token from environment variables
+TOKEN = os.getenv('DISCORD_TOKEN')
 
 async def update_activity():
     url = "https://discord.com/api/v10/users/@me/activities"
