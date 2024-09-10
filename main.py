@@ -1,24 +1,30 @@
-from pypresence import Presence
-import time
+import aiohttp
+import asyncio
+import json
 
-# Replace with your actual Discord application's client ID
-client_id = '1'
+TOKEN = 'YOUR_DISCORD_USER_TOKEN'  # Replace with your Discord user token
 
-# Initialize the presence object
-RPC = Presence(client_id)
-RPC.connect()
+async def update_activity():
+    url = "https://discord.com/api/v10/users/@me/activities"
+    headers = {
+        'Authorization': f'Bearer {TOKEN}',
+        'Content-Type': 'application/json'
+    }
+    activity = {
+        "activity": {
+            "name": "Behind every move",
+            "type": 0  # 0 for playing
+        }
+    }
 
-def update_presence():
-    # Update presence with custom details
-    RPC.update(
-        state="The unseen hand",
-        details="Behind every move",
-        large_image="big_image",  # Use a key for the image; this should match the key you set in Discord Developer Portal
-        large_image_text="The Long Game",
-        start=time.time(),  # Using current time for the timestamp
-        activity_type=0,  # 0 for playing
-    )
+    async with aiohttp.ClientSession() as session:
+        while True:
+            async with session.patch(url, headers=headers, data=json.dumps(activity)) as resp:
+                if resp.status == 200:
+                    print("Activity updated successfully")
+                else:
+                    print(f"Failed to update activity: {resp.status}")
+            await asyncio.sleep(15)  # Update every 15 seconds
 
-while True:
-    update_presence()
-    time.sleep(15)  # Update every 15 seconds
+if __name__ == "__main__":
+    asyncio.run(update_activity())
